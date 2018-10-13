@@ -1,9 +1,27 @@
+<!--Goi khoi tao-->
+<?php
+require "config.php";
+require "db.php";
+$per_page = 2;
+$db = new Db;
+if(isset($_GET['page'])){
+	$page = $_GET['page'];
+}
+else
+{
+	$page = 1;
+}
+$sp = $_GET["key"];
 
+$total = $db->demSLSPTK($sp);
+
+$url = $_SERVER['PHP_SELF'];
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
 	<title>Mobile Admin</title>
-	<meta charset="UTF-8" />
+	<meta charset="UTF-8" /> 
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" href="public/css/bootstrap.min.css" />
 	<link rel="stylesheet" href="public/css/bootstrap-responsive.min.css" />
@@ -14,6 +32,13 @@
 	<link href="public/font-awesome/css/font-awesome.css" rel="stylesheet" />
 	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700,800' rel='stylesheet' type='text/css'>
 </head>
+<style>
+	.pagination li
+	{
+		list-style: none;
+		margin-left: 10px;
+	}
+</style>
 <body>
 
 <!--Header-part-->
@@ -53,9 +78,9 @@
 <!--start-top-serch-->
 <div id="search">
 	<form action="result.php" method="get">
-	<input type="text" placeholder="Search here..." name="key"/>
-	<button type="submit" class="tip-bottom" title="Search"><i class="icon-search icon-white"></i></button>
-</form>
+		<input type="text" placeholder="Search here..." name="key"/>
+		<button type="submit" class="tip-bottom" title="Search"><i class="icon-search icon-white"></i></button>
+	</form>
 </div>
 <!--close-top-serch-->
 
@@ -72,96 +97,74 @@
 
 	</ul>
 </div>
-
 <!-- BEGIN CONTENT -->
 <div id="content">
 	<div id="content-header">
-		<div id="breadcrumb"> <a href="#" title="Go to Home" class="tip-bottom current"><i class="icon-home"></i> Home</a></div>
-		<h1>Add New Product</h1>
+		<div id="breadcrumb"> <a href="index.php" title="Go to Home" class="tip-bottom current"><i class="icon-home"></i> Home</a></div>
+		<h1>Search Result:</h1>
 	</div>
 	<div class="container-fluid">
 		<hr>
 		<div class="row-fluid">
 			<div class="span12">
 				<div class="widget-box">
-					<div class="widget-title"> <span class="icon"> <i class="icon-align-justify"></i> </span>
-						<h5>Product Detail</h5>
+					<div class="widget-title"> <span class="icon"><a href="form.php"> <i class="icon-plus"></i> </a></span>
+						<h5>Products</h5>
 					</div>
 					<div class="widget-content nopadding">
+						<table class="table table-bordered table-striped">
+							<thead>
+							<tr>
+								<th></th>
+								<th>Name</th>
+								<th>Category</th>
+								<th>Producer</th>
+								<th>Description</th>
+								<th>Price (VND)</th>
+								<th>Action</th>
+							</tr>
+							</thead>
+							<tbody>
+							<tr class="viewproducts">
+								<?php 
+								 	
+								 	
+									$timKiemSLSP = $db->timKiemSLSP($sp, $page, $per_page);
+									foreach ($timKiemSLSP as $value) {	
+								?>
+								<td><img src='public/image/<?php echo $value['image'] ?>'></td>
+								<td><?php echo $value['name']?></td>
+								<td><?php echo $value['type_name'] ?></td>
+								<td><?php echo $value['manu_name'] ?></td>
+								<td>
+									<?php echo $value['description']?>
+								</td>
+								<td><?php echo $value['price']?></td>
+								<td>
+								
+									<a href="form.php" class="btn btn-success btn-mini">Edit</a>
+									<a href="delete.php?ID=<?php echo $value['ID'];?>" class="btn btn-danger btn-mini">Delete</a>
 
-						<!-- BEGIN USER FORM -->
-						<form action="#" method="post" class="form-horizontal" enctype="multipart/form-data">
-							<div class="control-group">
-								<label class="control-label">Name :</label>
-								<div class="controls">
-									<input type="text" class="span11" placeholder="Product name" name="name" /> *
-								</div>
-							</div>
-							<div class="control-group">
-								<label class="control-label">Choose a product type :</label>
-								<div class="controls">
-									<select name="type_id">
-										<option value="5">Speaker</option>
-										<option value="4">Notebook</option>
-										<option value="3">Headphone</option>
-										<option value="2">Laptop</option>
-										<option value="1">Smartphone</option>
+								</td>
+							</tr>
+							<?php } ?>
+						</tbody>
 
-									</select> *
-								</div>
-							</div>
-							<div class="control-group">
-								<label class="control-label">Choose a manufacture :</label>
-								<div class="controls">
-									<select name="manu_id">
-										<option value="5">SONY</option>
-										<option value="4">OPPO</option>
-										<option value="3">Samsung</option>
-										<option value="2">Xiaomi</option>
-										<option value="1">Apple</option>
-
-									</select> *
-								</div>
-								<div class="control-group">
-									<label class="control-label">Choose an image :</label>
-									<div class="controls">
-										<input type="file" name="fileUpload" id="fileUpload">
-									</div>
-								</div>
-								<div class="control-group">
-									<label class="control-label"  >Description</label>
-									<div class="controls">
-										<textarea class="span11" placeholder="Description" name = "description"></textarea>
-									</div>
-									<div class="control-group">
-										<label class="control-label">Price :</label>
-										<div class="controls">
-											<input type="text" class="span11" placeholder="Input price...." name = "price" /> *
-										</div>
-
-									</div>
-
-									<div class="form-actions">
-										<button type="submit" class="btn btn-success">Add</button>
-									</div>
-								</div>
-
-						</form>
-						<!-- END USER FORM -->
-
-
+						</table>
+						
 					</div>
+					<ul class="pagination">
+						<?php echo $db->paginate2($sp, $url, $total, $page, $per_page);										?>
+						</ul>
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
-
 <!-- END CONTENT -->
-
 <!--Footer-part-->
 <div class="row-fluid">
-	<div id="footer" class="span12"> 2017 &copy; TDC - Lập trình web 1</div>
+	<div id="footer" class="span12"> 2018 &copy; TDC - Lập trình web 1</div>
 </div>
 <!--end-Footer-part-->
 <script src="public/js/jquery.min.js"></script>

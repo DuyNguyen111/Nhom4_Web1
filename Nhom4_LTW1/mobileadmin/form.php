@@ -1,20 +1,11 @@
-<!--Goi khoi tao-->
-<?php
-require "config.php";
-require "db.php";
-$per_page = 5;
-$db = new Db();
-if(isset($_GET['page'])){
-	$page = $_GET['page'];
-}
-else
+<?php 
+session_start();
+if($_SESSION['user'] != 'admin')
 {
-	$page = 1;
+	header('location: index.php');
 }
 
-$total = $db->demSLSP();
-$url = $_SERVER['PHP_SELF'];
-?>
+ ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -29,20 +20,6 @@ $url = $_SERVER['PHP_SELF'];
 	<link rel="stylesheet" href="public/css/matrix-media.css" />
 	<link href="public/font-awesome/css/font-awesome.css" rel="stylesheet" />
 	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700,800' rel='stylesheet' type='text/css'>
-	<style type="text/css">
-		ul.pagination{
-			list-style: none;
-			float: right;
-		}
-		ul.pagination li.active{
-			font-weight: bold
-		}
-		ul.pagination li{
-		  float: left;
-		  display: inline-block;
-		  padding: 10px
-		}
-	</style>
 </head>
 <body>
 
@@ -77,7 +54,6 @@ $url = $_SERVER['PHP_SELF'];
 		</li>
 		<li class=""><a title="" href="#"><i class="icon icon-cog"></i> <span class="text">Settings</span></a></li>
 		<li class=""><a title="" href="login.php"><i class="icon icon-share-alt"></i> <span class="text">Logout</span></a></li>
-		<li class="login"><a title="" href="login.php"><i class="icon icon-share-alt"></i> <span class="text">Log In</span></a></li>
 	</ul>
 </div>
 
@@ -103,72 +79,94 @@ $url = $_SERVER['PHP_SELF'];
 
 	</ul>
 </div>
+
 <!-- BEGIN CONTENT -->
 <div id="content">
 	<div id="content-header">
-		<div id="breadcrumb"> <a href="index.php" title="Go to Home" class="tip-bottom current"><i class="icon-home"></i> Home</a></div>
-		<h1>Manage Products</h1>
+		<div id="breadcrumb"> <a href="#" title="Go to Home" class="tip-bottom current"><i class="icon-home"></i> Home</a></div>
+		<h1>Add New Product</h1>
 	</div>
 	<div class="container-fluid">
 		<hr>
 		<div class="row-fluid">
 			<div class="span12">
 				<div class="widget-box">
-					<div class="widget-title"> <span class="icon"><a href="form.php"> <i class="icon-plus"></i> </a></span>
-						<h5>Products</h5>
+					<div class="widget-title"> <span class="icon"> <i class="icon-align-justify"></i> </span>
+						<h5>Product Detail</h5>
 					</div>
 					<div class="widget-content nopadding">
-						<table class="table table-bordered table-striped">
-							<thead>
-							<tr>
-								<th></th>
-								<th>Name</th>
-								<th>Category</th>
-								<th>Producer</th>
-								<th>Description</th>
-								<th>Price (VND)</th>
-								<th>Action</th>
-							</tr>
-							</thead>
-							<tbody>
-							<tr class="viewproducts">
-								<?php 
-									$product1 = $db->product1($page, $per_page);
-									
-									foreach ($product1 as $value) {	
-								?>
-								<td><img src='public/image/<?php echo $value['image'] ?>'></td>
-								<td><?php echo $value['name']?></td>
-								<td><?php echo $value['type_name'] ?></td>
-								<td><?php echo $value['manu_name'] ?></td>
-								<td>
-									<?php echo $value['description']?>
-								</td>
-								<td><?php echo $value['price'] ?></td>
-								<td>
-								
-									<a href="form.php" class="btn btn-success btn-mini">Edit</a>
-									<a href="delete.php?ID=<?php echo $value['ID'];?>" class="btn btn-danger btn-mini">Delete</a>
 
-								</td>
-							</tr>
-							<?php } ?>
-						</tbody>
-						</table>
-						<ul class="pagination">
-						<?php echo $db->paginate($url, $total, $page, $per_page);?>
-						</ul>
-						
+						<!-- BEGIN USER FORM -->
+						<form action="addproduct.php" method="POST" class="form-horizontal" enctype="multipart/form-data">
+							<div class="control-group">
+								<label class="control-label">Name :</label>
+								<div class="controls">
+									<input type="text" class="span11" placeholder="Product name" name="name" /> *
+								</div>
+							</div>
+							<div class="control-group">
+								<label class="control-label">Choose a product type :</label>
+								<div class="controls">
+									<select name="type_id">
+										<option value="5">Speaker</option>
+										<option value="4">Notebook</option>
+										<option value="3">Headphone</option>
+										<option value="2">Laptop</option>
+										<option value="1">Smartphone</option>
+
+									</select> *
+								</div>
+							</div>
+							<div class="control-group">
+								<label class="control-label">Choose a manufacture :</label>
+								<div class="controls">
+									<select name="manu_id">
+										<option value="5">SONY</option>
+										<option value="4">OPPO</option>
+										<option value="3">Samsung</option>
+										<option value="2">Xiaomi</option>
+										<option value="1">Apple</option>
+
+									</select> *
+								</div>
+								<div class="control-group">
+									<label class="control-label">Choose an image :</label>
+									<div class="controls">
+										<input type="file" name="fileUpload" id="fileUpload">
+									</div>
+								</div>
+								<div class="control-group">
+									<label class="control-label"  >Description</label>
+									<div class="controls">
+										<textarea class="span11" placeholder="Description" name = "description"></textarea>
+									</div>
+									<div class="control-group">
+										<label class="control-label">Price :</label>
+										<div class="controls">
+											<input type="text" class="span11" placeholder="Input price...." name = "price" /> *
+										</div>
+									</div>
+									<div class="form-actions">
+										<button type="submit" class="btn btn-success">Add</button>
+									</div>
+								</div>
+
+						</form>
+						<!-- END USER FORM -->
+
+
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
+
 <!-- END CONTENT -->
+
 <!--Footer-part-->
 <div class="row-fluid">
-	<div id="footer" class="span12"> 2018 &copy; TDC - Lập trình web 1</div>
+	<div id="footer" class="span12"> 2017 &copy; TDC - Lập trình web 1</div>
 </div>
 <!--end-Footer-part-->
 <script src="public/js/jquery.min.js"></script>
@@ -181,4 +179,3 @@ $url = $_SERVER['PHP_SELF'];
 <script src="public/js/matrix.tables.js"></script>
 </body>
 </html>
-

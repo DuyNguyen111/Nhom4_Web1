@@ -2,8 +2,8 @@
 <?php
 require "config.php";
 require "db.php";
-$per_page = 2;
-$db = new Db;
+$per_page = 5;
+$db = new Db();
 if(isset($_GET['page'])){
 	$page = $_GET['page'];
 }
@@ -11,17 +11,16 @@ else
 {
 	$page = 1;
 }
-$sp = $_GET["key"];
-$count = $db->timKiemSLSP($sp, $page, $per_page);
-var_dump($count);
-$total = $db->timKiemSLSP($sp, $page, $per_page);
+
+$total = $db->demSLSP();
 $url = $_SERVER['PHP_SELF'];
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
 	<title>Mobile Admin</title>
-	<meta charset="UTF-8" /> 
+	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" href="public/css/bootstrap.min.css" />
 	<link rel="stylesheet" href="public/css/bootstrap-responsive.min.css" />
@@ -31,6 +30,20 @@ $url = $_SERVER['PHP_SELF'];
 	<link rel="stylesheet" href="public/css/matrix-media.css" />
 	<link href="public/font-awesome/css/font-awesome.css" rel="stylesheet" />
 	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700,800' rel='stylesheet' type='text/css'>
+	<style type="text/css">
+		ul.pagination{
+			list-style: none;
+			float: right;
+		}
+		ul.pagination li.active{
+			font-weight: bold
+		}
+		ul.pagination li{
+		  float: left;
+		  display: inline-block;
+		  padding: 10px
+		}
+	</style>
 </head>
 <body>
 
@@ -65,15 +78,16 @@ $url = $_SERVER['PHP_SELF'];
 		</li>
 		<li class=""><a title="" href="#"><i class="icon icon-cog"></i> <span class="text">Settings</span></a></li>
 		<li class=""><a title="" href="login.php"><i class="icon icon-share-alt"></i> <span class="text">Logout</span></a></li>
+		<li class="login"><a title="" href="login.php"><i class="icon icon-share-alt"></i> <span class="text">Log In</span></a></li>
 	</ul>
 </div>
 
 <!--start-top-serch-->
 <div id="search">
 	<form action="result.php" method="get">
-		<input type="text" placeholder="Search here..." name="key"/>
-		<button type="submit" class="tip-bottom" title="Search"><i class="icon-search icon-white"></i></button>
-	</form>
+	<input type="text" placeholder="Search here..." name="key"/>
+	<button type="submit" class="tip-bottom" title="Search"><i class="icon-search icon-white"></i></button>
+</form>
 </div>
 <!--close-top-serch-->
 
@@ -94,7 +108,7 @@ $url = $_SERVER['PHP_SELF'];
 <div id="content">
 	<div id="content-header">
 		<div id="breadcrumb"> <a href="index.php" title="Go to Home" class="tip-bottom current"><i class="icon-home"></i> Home</a></div>
-		<h1>Search Result:</h1>
+		<h1>Manage Products</h1>
 	</div>
 	<div class="container-fluid">
 		<hr>
@@ -120,10 +134,9 @@ $url = $_SERVER['PHP_SELF'];
 							<tbody>
 							<tr class="viewproducts">
 								<?php 
-								 	
-								 	
-									$timKiemSLSP = $db->timKiemSLSP($sp, $page, $per_page);
-									foreach ($timKiemSLSP as $value) {	
+									$product1 = $db->product1($page, $per_page);
+									
+									foreach ($product1 as $value) {	
 								?>
 								<td><img src='public/image/<?php echo $value['image'] ?>'></td>
 								<td><?php echo $value['name']?></td>
@@ -132,7 +145,7 @@ $url = $_SERVER['PHP_SELF'];
 								<td>
 									<?php echo $value['description']?>
 								</td>
-								<td><?php echo $value['price']?></td>
+								<td><?php echo $value['price'] ?></td>
 								<td>
 								
 									<a href="form.php" class="btn btn-success btn-mini">Edit</a>
@@ -144,11 +157,9 @@ $url = $_SERVER['PHP_SELF'];
 						</tbody>
 						</table>
 						<ul class="pagination">
-						<?php // echo $db->paginate($url, $total, $page, $per_page);
-						$link = $db->paginate($url, $total, $page, $per_page);
-						var_dump($link);
-						?>
+						<?php echo $db->paginate($url, $total, $page, $per_page);?>
 						</ul>
+						
 					</div>
 				</div>
 			</div>
@@ -171,3 +182,4 @@ $url = $_SERVER['PHP_SELF'];
 <script src="public/js/matrix.tables.js"></script>
 </body>
 </html>
+
